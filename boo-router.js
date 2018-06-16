@@ -21,8 +21,8 @@ class BooRouter extends PolymerElement {
         observer: '_calc',
         value: []
       },
-      page: {
-        type: String,
+      route: {
+        type: Object,
         notify: true
       },
       query: {
@@ -45,25 +45,27 @@ class BooRouter extends PolymerElement {
       if (matched == null) {
         continue;
       }
-      this.page = rule.page;
+      this.route = {
+        page: rule.page,
+        params: this.q(matched)
+      };
       let query = {};
       for(let j in this.location.query) {
         query[j] = this.location.query[j];
       }
-      this.query = this.q(query, matched);
+      this.query = query;
       this.tail = this.t(this.location, path, regexp);
       return;
     }
   }
 
-  q(query, matched) {
+  q(matched) {
     matched.splice(0, 1);
-    query.__uris = matched;
     delete(matched['groups']);
     delete(matched['input']);
     delete(matched['index']);
 
-    return query;
+    return matched;
   }
 
   t(location, path, regexp) {

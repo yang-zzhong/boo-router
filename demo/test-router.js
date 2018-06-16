@@ -7,10 +7,10 @@ class TestRouter extends PolymerElement {
       <boo-router 
         location="[[location]]"
         rules="[[rules]]"
-        page="{{page}}"
+        route="{{route}}"
         query="{{query}}"></boo-router>
 
-      <div>page: [[page]]</div>
+      <div>route: [[_route]]</div>
       <div>query: [[_query]]</div>
     `;
   }
@@ -32,11 +32,15 @@ class TestRouter extends PolymerElement {
           page: 'hello'
         }]
       },
-      page: String,
+      route: Object,
       query: Object,
       _query: {
         type: String,
         computed: '_computeQuery(query)'
+      },
+      _route: {
+        type: String,
+        computed: '_computeQuery(route)'
       }
     };
   }
