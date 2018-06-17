@@ -20,7 +20,7 @@ class TestRouter extends PolymerElement {
       location: {
         type: Object,
         value: {
-          path: '/hello/1234/321/world/1234',
+          path: '/yang-zhong/cates/1743853815',
           query: {},
           hash: '',
         }
@@ -28,7 +28,7 @@ class TestRouter extends PolymerElement {
       rules: {
         type: Array,
         value: [{
-          regexp: '\/hello\/(\\d+)/(\\d+)',
+          rule: '/:user_name/cates/:cate_id',
           page: 'hello'
         }]
       },

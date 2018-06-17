@@ -1,9 +1,8 @@
-import {html, PolymerElement} from '@polymer/polymer/polymer-element.js';
+import {PolymerElement} from '@polymer/polymer/polymer-element.js';
 
 /**
  * `boo-router`
  * 
- *
  * @customElement
  * @polymer
  * @demo demo/index.html
@@ -13,13 +12,11 @@ class BooRouter extends PolymerElement {
     return {
       location: {
         type: Object,
-        observer: '_calc',
-        value: ""
+        observer: '_calc'
       },
       rules: {
         type: Array,
-        observer: '_calc',
-        value: []
+        observer: '_calc'
       },
       route: {
         type: Object,
@@ -37,41 +34,72 @@ class BooRouter extends PolymerElement {
   }
 
   _calc() {
-    let path = this.location.path;
-    for(let i in this.rules) {
-      let rule = this.rules[i];
-      let regexp = new RegExp(rule.regexp);
-      let matched = path.match(regexp);
-      if (matched == null) {
-        continue;
-      }
-      this.route = {
-        page: rule.page,
-        params: this.q(matched)
-      };
-      let query = {};
-      for(let j in this.location.query) {
-        query[j] = this.location.query[j];
-      }
-      this.query = query;
-      this.tail = this.t(this.location, path, regexp);
+    if (!this.location) {
       return;
+    }
+    let path = this.location.path;
+    if (path == "") {
+      this.route = { page: "__root", params: {} };
+      return;
+    }
+    for(let i in this.rules) {
+      if (this._match(this.rules[i], path)) {
+        return;
+      }
     }
   }
 
-  q(matched) {
-    matched.splice(0, 1);
-    delete(matched['groups']);
-    delete(matched['input']);
-    delete(matched['index']);
-
-    return matched;
+  _match(rule, path) {
+    let r = this._regexp(rule['rule']);
+    let matched = path.match(r.regexp);
+    if (matched == null) {
+      return false;
+    }
+    this.route = {
+      page: rule.page,
+      params: this._params(this._m(matched), r.ids)
+    };
+    let query = {};
+    for(let j in this.location.query) {
+      query[j] = this.location.query[j];
+    }
+    query['__uris'] = this.route.params;
+    this.query = query;
+    this.tail = (function(location, path) {
+      location.path = path;
+      return location;
+    })(this.location, path.replace(r.regexp, ""));
+    return true;
   }
 
-  t(location, path, regexp) {
-    location.path = path.replace(regexp, "");
+  _regexp(rule) {
+    let ids = this._m(rule.match(/(:\w+)/g));
+    rule = rule.replace(/(:\w+)/g, '([^\/]+)');
+    return {
+      ids: ids,
+      regexp: new RegExp('^'+rule.replace(/\//, '\/'))
+    }
+  }
 
-    return location;
+  _params(p, ids) {
+    let result = {};
+    for(let i in p) {
+      result[ids[i].replace(":", "")] = p[i];
+    }
+    return result;
+  }
+
+  _m(matched) {
+    if (!matched) {
+      return null;
+    }
+    if (matched['input']) {
+      matched.splice(0, 1);
+      delete(matched['input']);
+      delete(matched['groups']);
+      delete(matched['index']);
+    }
+    return matched;
   }
 }
 
