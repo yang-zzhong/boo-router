@@ -38,7 +38,7 @@ class BooRouter extends PolymerElement {
       return;
     }
     let path = this.location.path;
-    if (path == "") {
+    if (path == "" || path == "/") {
       this.route = { page: "__root", params: {} };
       return;
     }
