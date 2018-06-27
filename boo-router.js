@@ -66,10 +66,12 @@ class BooRouter extends PolymerElement {
     }
     query['__uris'] = this.route.params;
     this.query = query;
-    this.tail = (function(location, path) {
-      location.path = path;
-      return location;
-    })(this.location, path.replace(r.regexp, ""));
+    this.tail = (function(query, path) {
+      return {
+        path: path,
+        query: query,
+      };
+    })(this.location.query, path.replace(r.regexp, ""));
     return true;
   }
 
