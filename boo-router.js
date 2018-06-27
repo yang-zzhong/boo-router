@@ -47,6 +47,7 @@ class BooRouter extends PolymerElement {
         return;
       }
     }
+    this.route = { page: "__undefined", params: {} };
   }
 
   _match(rule, path) {

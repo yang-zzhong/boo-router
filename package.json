@@ -1,7 +1,7 @@
 {
   "name": "boo-router",
   "main": "boo-router.js",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
     "@polymer/iron-location": "^3.0.0-pre.21"
