@@ -16,7 +16,8 @@ class BooRouter extends PolymerElement {
       },
       rules: {
         type: Array,
-        observer: '_calc'
+        observer: '_calc',
+        value: []
       },
       route: {
         type: Object,
