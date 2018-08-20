@@ -47,7 +47,16 @@ class BooRouter extends PolymerElement {
         return;
       }
     }
-    this.route = { page: "__undefined", params: {} };
+    let p = path.replace(/^\//g, '').split("/");
+    this.route = {
+      page: p.shift(),
+      params: {}
+    };
+    this.tail = {
+      path: '/' + p.join('/'),
+      query: this.location.query,
+      hash: this.location.hash,
+    };
   }
 
   _match(rule, path) {

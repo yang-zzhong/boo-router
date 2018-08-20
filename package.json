@@ -1,12 +1,13 @@
 {
   "name": "boo-router",
   "main": "boo-router.js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
     "@polymer/iron-location": "^3.0.0-pre.21"
   },
   "devDependencies": {
+    "@polymer/paper-input": "^3.0.0-pre.21",
     "@polymer/iron-demo-helpers": "^3.0.0-pre.21",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "wct-browser-legacy": "^1.0.0"
