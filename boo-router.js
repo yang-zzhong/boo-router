@@ -21,6 +21,7 @@ class BooRouter extends PolymerElement {
       },
       route: {
         type: Object,
+        observer: '_routeChanged',
         notify: true
       },
       query: {
@@ -70,12 +71,6 @@ class BooRouter extends PolymerElement {
       page: rule.page,
       params: this._params(this._m(matched), r.ids)
     };
-    let query = {};
-    for(let j in this.location.query) {
-      query[j] = this.location.query[j];
-    }
-    query['__uris'] = this.route.params;
-    this.query = query;
     this.tail = (function(query, path) {
       return {
         path: path,
@@ -100,6 +95,18 @@ class BooRouter extends PolymerElement {
       result[ids[i].replace(":", "")] = p[i];
     }
     return result;
+  }
+
+  _routeChanged(route) {
+    if (!this.route) {
+      return;
+    }
+    let query = {};
+    for(let j in this.location.query) {
+      query[j] = this.location.query[j];
+    }
+    query['__uris'] = this.route.params;
+    this.query = query;
   }
 
   _m(matched) {
