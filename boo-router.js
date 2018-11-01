@@ -16,12 +16,11 @@ class BooRouter extends PolymerElement {
       },
       rules: {
         type: Array,
-        observer: '_calc',
         value: []
       },
-      route: {
+      routed: {
         type: Object,
-        observer: '_routeChanged',
+        observer: '_routedChanged',
         notify: true
       },
       query: {
@@ -35,30 +34,45 @@ class BooRouter extends PolymerElement {
     };
   }
 
-  _calc() {
-    if (!this.location) {
+  route(location, rules) {
+    if (!location) {
       return;
     }
-    let path = this.location.path;
+    rules = rules || this.rules;
+    let r = {};
+    let path = location.path;
     if (path == "" || path == "/") {
-      this.route = { page: "__root", params: {} };
-      return;
+      r.routed = { page: "__root", params: {} };
+      return r;
     }
-    for(let i in this.rules) {
-      if (this._match(this.rules[i], path)) {
-        return;
+    for(let i in rules) {
+      let r = this._match(rules[i], path);
+      if (r !== false) {
+        r.query = this._queryParams(location, r.routed);
+        return r;
       }
     }
     let p = path.replace(/^\//g, '').split("/");
-    this.route = {
+    r.routed = {
       page: p.shift(),
       params: {}
     };
-    this.tail = {
+    r.tail = {
       path: '/' + p.join('/'),
-      query: this.location.query,
-      hash: this.location.hash,
+      query: location.query,
+      hash: location.hash,
     };
+    r.query = location.query;
+    return r;
+  }
+
+  _calc() {
+    let res = this.route(this.location);
+    if (res) {
+      this.routed = res.routed;
+      this.tail = res.tail;
+      this.query = res.query;
+    }
   }
 
   _match(rule, path) {
@@ -67,17 +81,18 @@ class BooRouter extends PolymerElement {
     if (matched == null) {
       return false;
     }
-    this.route = {
+    let res = {};
+    res.routed = {
       page: rule.page,
       params: this._params(this._m(matched), r.ids)
     };
-    this.tail = (function(query, path) {
+    res.tail = (function(query, path) {
       return {
         path: path,
         query: query,
       };
-    })(this.location.query, path.replace(r.regexp, ""));
-    return true;
+    })(location.query, path.replace(r.regexp, ""));
+    return res;
   }
 
   _regexp(rule) {
@@ -97,16 +112,22 @@ class BooRouter extends PolymerElement {
     return result;
   }
 
-  _routeChanged(route) {
-    if (!this.route) {
+  _routedChanged(routed) {
+    if (routed == null) {
       return;
     }
+
+    this.query = this._queryParams(this.location, routed);
+  }
+
+  _queryParams(location, routed) {
     let query = {};
-    for(let j in this.location.query) {
-      query[j] = this.location.query[j];
+    for(let j in location.query) {
+      query[j] = location.query[j];
     }
-    query['__uris'] = this.route.params;
-    this.query = query;
+    query['__uris'] = routed.params;
+
+    return query;
   }
 
   _m(matched) {
