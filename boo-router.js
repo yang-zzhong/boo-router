@@ -40,19 +40,19 @@ class BooRouter extends PolymerElement {
     }
     rules = rules || this.rules;
     let r = {};
-    let path = location.path;
-    if (path == "" || path == "/") {
+    if (location.path == "" || location.path == "/") {
       r.routed = { page: "__root", params: {} };
+      r.query = this._queryParams(location, r.routed);
       return r;
     }
     for(let i in rules) {
-      let r = this._match(rules[i], path);
+      let r = this._match(rules[i], location);
       if (r !== false) {
         r.query = this._queryParams(location, r.routed);
         return r;
       }
     }
-    let p = path.replace(/^\//g, '').split("/");
+    let p = location.path.replace(/^\//g, '').split("/");
     r.routed = {
       page: p.shift(),
       params: {}
@@ -75,7 +75,8 @@ class BooRouter extends PolymerElement {
     }
   }
 
-  _match(rule, path) {
+  _match(rule, location) {
+    let path = location.path;
     let r = this._regexp(rule['rule']);
     let matched = path.match(r.regexp);
     if (matched == null) {
